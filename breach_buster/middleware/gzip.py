@@ -1,10 +1,46 @@
+from __future__ import absolute_import
 import re
-
-from django.utils.cache import patch_vary_headers
+from gzip import GzipFile
 from random import choice, expovariate
 from io import BytesIO
 
+class StreamingBuffer(object):
+    def __init__(self):
+        self.vals = []
+
+    def write(self, val):
+        self.vals.append(val)
+
+    def read(self):
+        ret = b''.join(self.vals)
+        self.vals = []
+        return ret
+
+    def flush(self):
+        return
+
+    def close(self):
+        return
+
 re_accepts_gzip = re.compile(r'\bgzip\b')
+def patch_vary_headers(response, newheaders):
+    """
+    Adds (or updates) the "Vary" header in the given HttpResponse object.
+    newheaders is a list of header names that should be in "Vary". Existing
+    headers in "Vary" aren't removed.
+    """
+    # Note that we need to keep the original order intact, because cache
+    # implementations may rely on the order of the Vary contents in, say,
+    # computing an MD5 hash.
+    if response.has_header('Vary'):
+        vary_headers = cc_delim_re.split(response['Vary'])
+    else:
+        vary_headers = []
+    # Use .lower() here so we treat headers as case-insensitive.
+    existing_headers = set([header.lower() for header in vary_headers])
+    additional_headers = [newheader for newheader in newheaders
+                          if newheader.lower() not in existing_headers]
+    response['Vary'] = ', '.join(vary_headers + additional_headers)
 
 
 AVERAGE_SPAN_BETWEEN_FLUSHES = 1024
@@ -34,10 +70,9 @@ def compress_sequence(sequence):
     zfile = GzipFile(mode='wb', compresslevel=choice((6, 7, 8)), fileobj=buf)
     # Output headers...
     count = int(expovariate(avg_block_size))
-    chunking_buf = BytesIO()
     yield buf.read()
     for item in sequence:
-        chunking_buf.write(item)
+        chunking_buf = BytesIO(item)
         chunk = chunking_buf.read(count)
         while chunk:
             count -= len(chunk)
