@@ -11,12 +11,12 @@ Replacement for Django's gzip middleware.  Protects against BREACH.
 from setuptools import setup
 
 setup(
-    name='breach_buster_middleware',
+    name='django_breach_buster',
     version='0.0.0',
     author='Adam DePrince',
     author_email='adeprince@nypublicradio.org',
     description='BREACH resistant gzip middleware',
-    url="",
+    url="https://github.com/wnyc/breach_buster",
     long_description=__doc__,
     py_modules=[
         'breach_buster/__init__',
