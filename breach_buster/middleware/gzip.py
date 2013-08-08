@@ -3,6 +3,7 @@ import re
 from gzip import GzipFile
 from random import choice, expovariate
 from io import BytesIO
+from StringIO import StringIO
 
 class StreamingBuffer(object):
     def __init__(self):
@@ -43,22 +44,24 @@ def patch_vary_headers(response, newheaders):
     response['Vary'] = ', '.join(vary_headers + additional_headers)
 
 
-AVERAGE_SPAN_BETWEEN_FLUSHES = 1024
-APPROX_MIN_FLUSHES = 4
+AVERAGE_SPAN_BETWEEN_FLUSHES = 8192
+APPROX_MIN_FLUSHES = 3
+
 def compress_string(s):
     if len(s) < AVERAGE_SPAN_BETWEEN_FLUSHES * APPROX_MIN_FLUSHES:
         avg_block_size = APPROX_MIN_FLUSHES / float(len(s))
     else:
         avg_block_size = 1.0 / AVERAGE_SPAN_BETWEEN_FLUSHES
 
-    s = BytesIO(s)
+    s = StringIO(s)
     zbuf = BytesIO()
     zfile = GzipFile(mode='wb', compresslevel=choice((6,7,8)), fileobj=zbuf)
-    chunk = s.read(int(expovariate(avg_block_size)))
+    chunk = s.read(16+int(expovariate(avg_block_size)))
     while chunk:
         zfile.write(chunk)
         zfile.flush()
-        chunk = s.read(int(expovariate(avg_block_size)))
+        chunk = s.read(16+int(expovariate(avg_block_size)))
+    zfile.flush()
     zfile.close()
     return zbuf.getvalue()
 
