@@ -1,8 +1,8 @@
 BREACH_BUSTER
 =============
 
-Django gzip middleware replacement that protects against SSL BREACH
-vulnerability by randomizing the length of the compressed stream.
+Django gzip middleware replacement that protects against SSL BREACH by
+randomizing the length of the compressed stream.
 
 Usage
 -----
