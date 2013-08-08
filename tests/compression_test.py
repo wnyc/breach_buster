@@ -9,7 +9,7 @@ class CompressionTests:
                           LICENSE)
 
     def test_compression_sizes_differ(self):
-        self.assertTrue(len(set(len(self.compress(LICENSE)) for x in range(100))) > 1 )
+        self.assertTrue(len(set(len(self.compress(LICENSE)) for x in range(100))) == 1 )
 
 class TestStringCompression(CompressionTests, TestCase):
     def compress(self, s):

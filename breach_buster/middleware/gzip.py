@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 import re
 from gzip import GzipFile
-from random import choice, expovariate
+from random import Random
 from io import BytesIO
 from StringIO import StringIO
 
@@ -56,6 +56,8 @@ def compress_string(s):
     # avg_block_size is acutally the reciporical of the average
     # intended interflush distance.   
 
+    rnd = Random(s)
+
     flushes_remaining = FLUSH_LIMIT
 
     if len(s) < AVERAGE_SPAN_BETWEEN_FLUSHES * APPROX_MIN_FLUSHES:
@@ -66,12 +68,12 @@ def compress_string(s):
     s = StringIO(s)
     zbuf = BytesIO()
     zfile = GzipFile(mode='wb', compresslevel=6, fileobj=zbuf)
-    chunk = s.read(MIN_INTERFLUSH_INTERVAL + int(expovariate(avg_block_size)))
+    chunk = s.read(MIN_INTERFLUSH_INTERVAL + int(rnd.expovariate(avg_block_size)))
     while chunk and flushes_remaining:
         zfile.write(chunk)
         zfile.flush()
         flushes_remaining -= 1
-        chunk = s.read(MIN_INTERFLUSH_INTERVAL + int(expovariate(avg_block_size)))
+        chunk = s.read(MIN_INTERFLUSH_INTERVAL + int(rnd.expovariate(avg_block_size)))
     zfile.write(chunk)
     zfile.write(s.read())
     zfile.close()
@@ -87,9 +89,13 @@ def compress_sequence(sequence):
     yield buf.read()
 
     flushes_remaining = FLUSH_LIMIT
-
-    count = int(expovariate(avg_block_size))
+    rnd = None
+    count = None
+    rnd = None
     for item in sequence:
+        if rnd is None:
+            rnd = Random(0)
+            count = int(rnd.expovariate(avg_block_size))
         chunking_buf = BytesIO(item)
         chunk = chunking_buf.read(count)
         while chunk:
@@ -101,7 +107,7 @@ def compress_sequence(sequence):
                 zfile.flush()
                 yield buf.read()
                 if flushes_remaining:
-                    count = int(expovariate(avg_block_size))
+                    count = int(rnd.expovariate(avg_block_size))
                 else:
                     count = None
             if count is None:

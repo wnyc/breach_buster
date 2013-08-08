@@ -248,37 +248,8 @@ Try this attack against the breach_buster Gzip middle ware module.
     (lots and lots of output, never ends)
 
 It is obvious from the output the search is failing to converge and
-will never find the key.  Lets look at the length of the returned
-output to better understand why:
+will never find the key. 
 
-    >>> def length(name):
-    ...     return len(urllib2.urlopen('http://127.0.0.1:8081/good?name=' + name).read())
-    ...
-    >>>
-    >>> length('')
-    946
-    >>> length('')
-    931
-    >>> length('')
-    985
-    >>> length('')
-    1028
-    >>> length('')
-    923
-    >>> length('')
-    994
-    >>> length('')
-    1016
-    >>> length('')
-    950
-    >>> length('')
-    979
-    >>> length('')
-    1045
-    >>> length('')
-    1011
-    
-    
 What's happening to cause this?  First consider how gzip might be used
 in an interactive session.
 
