@@ -22,14 +22,16 @@ setup(
         'breach_buster/__init__',
         'breach_buster/middleware/__init__',
         'breach_buster/middleware/gzip',
+        'breach_buster/examples/__init__',
+        'breach_buster/examples/demo_server',
         ],
     packages=['breach_buster',],
     zip_safe=True,
     license='GPLv3',
     include_package_data=True,
     classifiers=[],
-    scripts=[],
+    scripts=[], 
     install_requires=[
-        'django',
+        'web.py'
         ]
     )
