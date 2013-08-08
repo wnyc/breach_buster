@@ -1,14 +1,36 @@
 BREACH_BUSTER
 =============
 
-Django middleware that (hopefully) protects against the SSL BREACH vulnerability.
+Django gzip middleware replacement that protects against the SSL
+BREACH vulnerability by randomizing the length of the compressed
+stream.
 
-What's BREACH
--------------
+Usage
+-----
+
+Install breach buster
+
+    $ pip install breach_buster
+
+Open your settings.py file in an editor and modifiy it so 
+
+    MIDDLEWARE_CLASSES = (
+        'django.middleware.gzip.GZipMiddleware',
+        'johnny.middleware.LocalStoreClearMiddleware',
+
+django.middleware.gzip.GZipMiddleware is replaced with breach_buster.middleware.gzip.GZipMiddleWare
+
+    MIDDLEWARE_CLASSES = (
+        'breach_buster.middleware.gzip.GZipMiddleware',
+        'johnny.middleware.LocalStoreClearMiddleware',
+
+
+Detailed Explanation
+--------------------
 
 BREACH is a side channel attack that takes advantage of a well known
-characteristic of data compression : files that are self similar will
-tend to be smaller.
+characteristic of data compression: files that are self similar will
+tend to be smaller.   This is used to 
 
 Lets take a look at what that means.  In the code below we feed two
 sentences to the zlib compressor.  Both sentences are the same length,
