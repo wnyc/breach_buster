@@ -22,6 +22,7 @@ setup(
         'breach_buster/__init__',
         'breach_buster/middleware/__init__',
         'breach_buster/middleware/gzip',
+        'breach_buster/examples/__init__',
         'breach_buster/examples/demo_server',
         ],
     packages=['breach_buster',],
