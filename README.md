@@ -1,9 +1,8 @@
 BREACH_BUSTER
 =============
 
-Django gzip middleware replacement that protects against the SSL
-BREACH vulnerability by randomizing the length of the compressed
-stream.
+Django gzip middleware replacement that protects against SSL BREACH
+vulnerability by randomizing the length of the compressed stream.
 
 Usage
 -----
@@ -12,13 +11,13 @@ Install breach buster
 
     $ pip install breach_buster
 
-Open your settings.py file in an editor and modifiy it so 
+Open your settings.py file in an editor and modifiy it to
 
     MIDDLEWARE_CLASSES = (
         'django.middleware.gzip.GZipMiddleware',
         'johnny.middleware.LocalStoreClearMiddleware',
 
-django.middleware.gzip.GZipMiddleware is replaced with breach_buster.middleware.gzip.GZipMiddleWare
+replace django's GzipMiddleware with breach buster's.  
 
     MIDDLEWARE_CLASSES = (
         'breach_buster.middleware.gzip.GZipMiddleware',
@@ -34,7 +33,7 @@ tend to be smaller.   This is used to
 
 Lets take a look at what that means.  In the code below we feed two
 sentences to the zlib compressor.  Both sentences are the same length,
-except the latter repalaces dog with fox, a string that was already
+except the latter replaces dog with fox, a string that was already
 used.
 
     >>> import zlib
@@ -45,11 +44,10 @@ used.
     >>> 
 
 
-The later compresses to 3 bytes less than the former.  Now you might
-be thinking "well that's a bad example, the so called compression
-resulted in a file that is longer than the origianl.  True, but the
-same applies to larger files as well.  Lets try again with a longer
-example.
+The later compresses to 3 bytes less than the former.  You might be
+thinking "well that's a bad example, the so called compression made
+the file larger". True, but the same applies to larger files as well.
+Lets try again with a longer example.
 
 Here we download a copy of the Wikipedia article on the the Communist
 Manifesto.  To prepare two files that are different we append to one
@@ -79,9 +77,9 @@ So how does BREACH take advantage of this?
 
 It is assumed an attacker using BREACH has three non-trivial to obtain abilities.  
 
-First, we assume the attacker has the ability to monitor the victims
+First, we assume the attacker has the ability to monitor the victim's
 internet connection.  This can happen in many ways.  The attacker can
-be sniffing the victims' local wifi or ethernet connection, they can
+be sniffing the victim's local wifi or ethernet connection, they can
 work for the victim's ISP.  All they need to do is be able to see the
 data common back well enough to measure the length of each response. 
 
@@ -100,15 +98,15 @@ It i important to stress that the attacker should know what they are
 looking for.  This attack cannot give us the contents of the page, it
 can only betray a small peice.  If the attacker has already visited
 this site and knows the secret to be in a field called
-"uber_secret_api_key=<8 digit hexidecimal number>" then this attack
+`"uber_secret_api_key=<8 digit hexidecimal number>"` then this attack
 will work.  If we've never seen this page because we cannot coerse the
 browser to make a copy for us sans the secrets we are looking for,
 this attack won't work.
 
 There are all sorts of ways we could achive these three requirements.
 You could intercept non-encrytped web traffic and inject a little HTML
-that looks something like this: <img
-href="http://victimsbank.com/..."> You could setup a transparent web
+that looks something like this: `<img
+href="http://victimsbank.com/...">` You could setup a transparent web
 proxy in their emplyoer's data cabinet.  Or you could simply email
 them a link to a website with pictures of pretty undressed people.
 
@@ -145,17 +143,15 @@ Lets run the breach_buster_demo_server and put it in the background:
 
 `$ breach_buster_demo_server 127.0.0.1:8080 &`
 
-This server is also very friendly and will call you by name if
-provided a parameter called "name."  This is the point we will use to
-inject content into the site.
+This server is also very friendly; the returned content will call you
+by name if provided a parameter called "name."  This is how we inject content into the site.
 
-Now Open a window to your python interepter and lets start writing a bit of code. 
+Open a window to your python interepter and lets start writing a bit of code. 
 
     >>> import urllib2 
     >>> def length(name):
     ...     return len(urllib2.urlopen('http://127.0.0.1:8080/bad?name=' + name).read())
     ...
-
 
 The breach_buster_demo_server and urllib2 both have conveniennt bugs
 for this project.  breach_buster_demo_server doesn't check if the
@@ -166,7 +162,7 @@ content directly off the wire.
     >>> length('')
     883
 
-Now lets try adding a few strings.
+Lets try adding a few strings.
 
     >>> length('foobar')
     887
@@ -177,7 +173,7 @@ Now lets try adding a few strings.
     >>> length('do_something?CSRF=')
     886
 
-We expect do_something?CSRF= to add relatively little data
+We expect `do_something?CSRF=` to add relatively little data
 proportional to the length of the added string because this string
 already exists in the output.
 
@@ -203,8 +199,6 @@ Lets try all possiable combinations of first letters:
     f 886
 
 We can see that e and f are excellent consideration.  Lets try adding another letter to both e and f.
-
-
 
     >>> for l1 in 'ef':
     ...     for l2 in '01234566789abcdef': print l1+l2, length('do_something?CSRF=' + l1 + l2)                                                                        
@@ -248,14 +242,13 @@ Give it a try:
     888 f675d2395f243c89 !
     Found on try# 12 5200
 
-Now lets try this attack against the breach_buster Gzip middle ware
-module. 
+Try this attack against the breach_buster Gzip middle ware module.
 
     $ python scripts/breach_busters_demo_client --busted 
     (lots and lots of output, never ends)
 
-Its pretty obvious from the output the search is failing to converge
-and will never find the key.  Lets look at the length of the returned
+It is obvious from the output the search is failing to converge and
+will never find the key.  Lets look at the length of the returned
 output to better understand why:
 
     >>> def length(name):
@@ -286,8 +279,8 @@ output to better understand why:
     1011
     
     
-What's happening to cause this?  Well, lets first consider how gzip
-might be used in an interactive session.
+What's happening to cause this?  First consider how gzip might be used
+in an interactive session.
 
 Zlib compression, the underlying library behind gzip, is used for more
 than file compression.  Assuming the data stream you work with is
