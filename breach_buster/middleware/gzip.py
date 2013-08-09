@@ -62,7 +62,7 @@ def compress_string(s):
     flushes_remaining = FLUSH_LIMIT
 
     if len(s) < AVERAGE_SPAN_BETWEEN_FLUSHES * APPROX_MIN_FLUSHES:
-        avg_block_size = APPROX_MIN_FLUSHES / float(len(s))
+        avg_block_size = APPROX_MIN_FLUSHES / float(len(s) + 1)
     else:
         avg_block_size = 1.0 / AVERAGE_SPAN_BETWEEN_FLUSHES
 

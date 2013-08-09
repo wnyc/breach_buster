@@ -11,6 +11,9 @@ class CompressionTests:
     def test_compression_sizes_differ(self):
         self.assertTrue(len(set(len(self.compress(LICENSE)) for x in range(100))) == 1 )
 
+    def test_zero_length_regress(self):
+        self.compress('') # Shouldn't raise a DivisionByZero error
+
 class TestStringCompression(CompressionTests, TestCase):
     def compress(self, s):
         return compress_string(s)
@@ -18,6 +21,8 @@ class TestStringCompression(CompressionTests, TestCase):
 class TestSequenceCompression(CompressionTests, TestCase):
     def compress(self, s):
         return ''.join(compress_sequence(list(StringIO(s))))
+
+
 
 
 LICENSE = """                    GNU GENERAL PUBLIC LICENSE
