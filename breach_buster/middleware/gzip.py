@@ -30,6 +30,7 @@ class StreamingBuffer(object):
         return
 
 re_accepts_gzip = re.compile(r'\bgzip\b')
+cc_delim_re = re.compile(r'\s*,\s*')
 
 def patch_vary_headers(response, newheaders):
     """
@@ -152,7 +153,7 @@ class GZipMiddleware(object):
         if not re_accepts_gzip.search(ae):
             return response
 
-        if response.streaming:
+        if getattr(response, 'streaming', False):
             # Delete the `Content-Length` header for streaming content, because
             # we won't know the compressed size until we stream it.
             response.streaming_content = compress_sequence(response.streaming_content)
