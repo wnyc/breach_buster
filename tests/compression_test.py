@@ -3,6 +3,18 @@ from gzip import GzipFile
 from unittest import TestCase
 from StringIO import StringIO
 
+class HashOverride(str):
+    def __init__(self, v):
+        str.__init__(self, v)
+
+    def __call__(self, v):
+        ho = HashOverride(v)
+        ho.hash = v.hash
+        return ho
+        
+    def __hash__(self):
+        return self.hash
+
 class CompressionTests:
     def test_compression_works(self):
         self.assertEquals(GzipFile(fileobj = StringIO(self.compress(LICENSE))).read(),
@@ -14,15 +26,40 @@ class CompressionTests:
     def test_zero_length_regress(self):
         self.compress('') # Shouldn't raise a DivisionByZero error
 
+    def test_same_strings_different_hash_are_compressed_randomly(self):
+        strings = map(HashOverride, [LICENSE,] * 20)
+        for v, string in enumerate(strings):
+            string.hash = v
+            
+        strings = set(map(len, map(self.compress, strings)))
+        self.assertTrue(len(strings) > 1, 
+                        msg="Make sure we have more than one compressed size for our compressed string")
+
+
 class TestStringCompression(CompressionTests, TestCase):
+
     def compress(self, s):
         return compress_string(s)
 
+
 class TestSequenceCompression(CompressionTests, TestCase):
+
     def compress(self, s):
-        return ''.join(compress_sequence(list(StringIO(s))))
-
-
+            
+        sio = StringIO(s)
+        chunk = sio.read(1024)
+        if isinstance(s, HashOverride):
+            chunk = HashOverride(chunk)
+            chunk.hash = s.hash
+        chunks = []
+        while chunk:
+            chunks.append(chunk)
+            chunk = sio.read(1024)
+            if isinstance(s, HashOverride):
+                chunk = HashOverride(chunk)
+                chunk.hash = s.hash
+        print map(type, chunks)
+        return str(''.join(compress_sequence(chunks)))
 
 
 LICENSE = """                    GNU GENERAL PUBLIC LICENSE

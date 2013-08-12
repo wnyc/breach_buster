@@ -95,7 +95,7 @@ def compress_sequence(sequence):
     rnd = None
     for item in sequence:
         if rnd is None:
-            rnd = Random(0)
+            rnd = Random(hash(item))
             count = int(rnd.expovariate(avg_block_size))
         chunking_buf = BytesIO(item)
         chunk = chunking_buf.read(count)
@@ -127,6 +127,7 @@ def compress_sequence(sequence):
         
     zfile.close()
     yield buf.read()
+
 
 class GZipMiddleware(object):
     """
