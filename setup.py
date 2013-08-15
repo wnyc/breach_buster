@@ -30,7 +30,7 @@ setup(
     license='GPLv3',
     include_package_data=True,
     classifiers=[],
-    scripts=[], 
+    scripts=['scripts/breach_buster_demo_client','scripts/breach_buster_demo_server'], 
     install_requires=[
         'web.py'
         ]

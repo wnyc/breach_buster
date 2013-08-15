@@ -107,8 +107,7 @@ There are multiple ways to achieve the three requirements.
     HTML: `<img href="http://victimsbank.com/...">`
   * The attacker could setup a transparent web
     proxy in their employer's data cabinet.
-  * The attacker could email the target a link to a website with
-    pictures of pretty undressed people.
+  * The attacker could email the target a link to a website of prurient interests to entice clicks.
 
 Nothing I describe here is too hard to come by for a moderately
 sophisticated geek.  And with this in mind we're going to build a
