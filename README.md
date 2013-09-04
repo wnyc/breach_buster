@@ -4,7 +4,7 @@ BREACH_BUSTER
 Django gzip middleware replacement that protects against SSL BREACH by
 randomizing the length of the compressed stream.
 
-See Django's [BREACH ticket](https://code.djangoproject.com/ticket/20869) and [pull request](http://https://github.com/django/django/pull/1473).
+See Django's [BREACH ticket](https://code.djangoproject.com/ticket/20869) and [pull request](https://github.com/django/django/pull/1473).
 
 Usage
 -----
